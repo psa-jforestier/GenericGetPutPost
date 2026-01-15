@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!--
+The prompt :
+
+generate the demo.html page.
+The demo page is very simple html, no facy color or layout, only native HTML, no extra css, all JS logic embeded in the demo.html page.
+
+The page show a text field "url" with the url of the api (default : http://localhost:8000/ggpp.php). It can be modified by the user.
+An other text field "client_id" is used for the user to enter the client_id (default : ggppdemo)
+
+A text area "data" of 10 lines allow user to enter or view data.
+A text area "error" of 10 lines will be used to display error received from the server.
+A text field "udi" allow user to enter or view udi (unique document identifier).
+
+Action buttons :
+- the "GET" button will trigger a GET request to the api url. The query string will contains the client_id and the udi. On success, the "data" text area contains the data received from the server, the "error" text area is empty. On error, the "error" text area contains the error code and message received from the server.
+
+- the "POST" button will trigger a POST request to the api. The query string will contains the client_id and the udi. The body posted will be the data from the "data" text area. On success, the "data" text area contains the data received from the server, the "error" text area is empty. On error, the "error" text area contains the error code and message received from the server.
+
+- the "PUT" button will trigger a PUT request to the API. The query string will contains the client_id only (not the udi, because the PUT request is used to push a new content). The body posted will be the data from the "data" text area. On success, the "data" text area contains the data received from the server, the "error" text area is empty. On success, data received is like "OK:ZZZZ", where ZZZZ is the UDI of the generated document. It must be indicated in the "udi" field.
+On error, the "error" text area contains the error code and message received from the server.
+
+-->
+<html>
+<head>
+    <title>GGPP Demo</title>
+</head>
+<body>
+    <h1>GGPP Demo</h1>
+    
+    <div>
+        <label>URL:</label>
+        <input type="text" id="url" value="http://localhost:8000/php/ggpp.php" style="width: 400px;">
+    </div>
+    
+    <div>
+        <label>Client ID:</label>
+        <input type="text" id="client_id" value="ggppdemo" style="width: 400px;">
+    </div>
+    
+    <div>
+        <label>UDI:</label>
+        <input type="text" id="udi" style="width: 400px;">
+    </div>
+    
+    <div>
+        <label>Data:</label>
+        <textarea id="data" rows="10" style="width: 400px;"></textarea>
+    </div>
+    
+    <div>
+        <label>Error:</label>
+        <textarea id="error" rows="10" style="width: 400px;"></textarea>
+    </div>
+    
+    <div>
+        Create new content : <button onclick="doPUT()">PUT</button><br/>
+        Retreive content created : <button onclick="doGET()">GET</button><br/>
+        Modify existing content : <button onclick="doPOST()">POST</button>
+        
+    </div>
+
+    <script>
+        function getURL() {
+            return document.getElementById('url').value;
+        }
+
+        function getClientId() {
+            return document.getElementById('client_id').value;
+        }
+
+        function getUDI() {
+            return document.getElementById('udi').value;
+        }
+
+        function getData() {
+            return document.getElementById('data').value;
+        }
+
+        function setData(value) {
+            document.getElementById('data').value = value;
+        }
+
+        function setError(value) {
+            document.getElementById('error').value = value;
+        }
+
+        function setUDI(value) {
+            document.getElementById('udi').value = value;
+        }
+
+        function doGET() {
+            const url = getURL();
+            const clientId = getClientId();
+            const udi = getUDI();
+
+            if (!url) {
+                setError('Client Error: URL is required');
+                return;
+            }
+
+            const queryString = '?client_id=' + encodeURIComponent(clientId) + '&udi=' + encodeURIComponent(udi);
+
+            fetch(url + queryString, {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error('HTTP ' + response.status + ': ' + text);
+                    });
+                }
+            })
+            .then(data => {
+                setData(data);
+                setError('');
+            })
+            .catch(error => {
+                setError(error.message);
+            });
+        }
+
+        function doPOST() {
+            const url = getURL();
+            const clientId = getClientId();
+            const udi = getUDI();
+            const data = getData();
+
+            if (!url) {
+                setError('Client Error: URL is required');
+                return;
+            }
+
+            const queryString = '?client_id=' + encodeURIComponent(clientId) + '&udi=' + encodeURIComponent(udi);
+
+            fetch(url + queryString, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error('HTTP ' + response.status + ': ' + text);
+                    });
+                }
+            })
+            .then(responseData => {
+                //setData(responseData);
+                setError(responseData);
+            })
+            .catch(error => {
+                setError(error.message);
+            });
+        }
+
+        function doPUT() {
+            const url = getURL();
+            const clientId = getClientId();
+            const udi = getUDI();
+            const data = getData();
+
+            if (!url) {
+                setError('Client Error: URL is required');
+                return;
+            }
+
+            const queryString = '?client_id=' + encodeURIComponent(clientId) + '&udi=' + encodeURIComponent(udi);
+
+            fetch(url + queryString, {
+                method: 'PUT',
+                body: data
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error('HTTP ' + response.status + ': ' + text);
+                    });
+                }
+            })
+            .then(responseData => {
+                // Extract UDI from "OK:UDI" response
+                const match = responseData.match(/^OK:(.+)/);
+                setError(responseData);
+                if (match) {
+                    setUDI(match[1].trim());
+                } else {
+                    setUDI("UDI not returned?");
+                }
+            })
+            .catch(error => {
+                setError(error.message);
+            });
+        }
+    </script>
+</body>
+</html>

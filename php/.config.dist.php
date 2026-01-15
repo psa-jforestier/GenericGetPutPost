@@ -1,0 +1,35 @@
+<?php
+/**
+ * This is the default configuration file. Do not change or delete it.
+ * Copy this file to "php/.config.php" and overload configuration in it as needed.
+ */
+global $CONFIG;
+$CONFIG = [
+    'storage' => 'file', // or mysql or sqlite
+    'max_size' => 1 * 1024 * 1024, // Maximum file size in bytes, must be aligned with the maximum post data size allowed by php (post_max_size )
+    'max_retention' => 2 * 365, // Maximum retention time in days
+    'salt' => 'please_change_this_salt_value', // Change this value to a random string for better security
+    // config for storage == file :
+    'file' => [
+        'path' => __DIR__ . '/../data/', // Path to the directory where files will be stored (must be rw accessible)
+        'sqlite' => 'sqlite:'.__DIR__.'/../data/ggpp_data.sqlite'        
+    ],
+    // config for storage == mysq :
+    'mysql' => [
+        'dsn' => 'mysql:host=localhost;dbname=ggpp_data;charset=utf8mb4'
+    ],
+    // config for storage == sqlite :
+    'sqlite' => [
+        'dsn' => 'sqlite:'.__DIR__.'/../data/ggpp_data.sqlite'
+    ],
+    // Other configurations :
+    'client_id' => [
+        // each IP using client1 can do 100 req per minute
+        'client1' => ['max_req_period' => 60, 'max_req_count' => 100, 'use_ip_lock' => true],
+        // each client2 can do 1 req per second without IP lock
+        'client2' => ['max_req_period' =>  1, 'max_req_count' =>   1, 'use_ip_lock' => false],
+    ]
+];
+
+// v
+@include_once('.config.php');

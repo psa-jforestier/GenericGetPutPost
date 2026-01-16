@@ -13,7 +13,7 @@ $CONFIG = [
         'path' => __DIR__ . '/../data/', // Path to the directory where files will be stored (must be rw accessible)
         'sqlite' => 'sqlite:'.__DIR__.'/../data/ggpp_data.sqlite'        
     ],
-    // config for storage == mysql :
+    // config for storage == mysql. Be sure to create the database (dbname) and user before using it.
     'mysql' => [
         'dsn' => 'mysql:host=localhost;dbname=ggpp_data;charset=utf8mb4',
         'username' => 'root', // Set to null if using socket authentication or .my.cnf

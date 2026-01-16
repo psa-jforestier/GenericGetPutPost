@@ -70,7 +70,7 @@ class GGPP {
         if ($max_req_period === -1 || $max_req_count === -1) {
             return true; // no limit
         }
-        $client_rate_key = $client_id . ($use_ip_lock ? '/'.$md5_ip_address : '');
+        $client_rate_key = $client_id . ($use_ip_lock ? '_'.$md5_ip_address : '');
         $now = time();
         //echo "Checkrate of $client_rate_key : Time = $now (".date('Y-m-d H:i:s', $now).")\n";
         $rounded_time = floor($now / $max_req_period) * $max_req_period;
@@ -85,7 +85,7 @@ class GGPP {
     }
 
     public function get_rate_usage($client_id, $md5_ip_address, $max_req_period, $max_req_count, $use_ip_lock) {
-        $client_rate_key = $client_id . ($use_ip_lock ? $md5_ip_address : '');
+        $client_rate_key = $client_id . ($use_ip_lock ? '_'.$md5_ip_address : '');
         $now = time();
         $rounded_time = floor($now / $max_req_period) * $max_req_period;
         $nb_req_for_period = $this->storage->get_request_count($client_rate_key, $rounded_time);

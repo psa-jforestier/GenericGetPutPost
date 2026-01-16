@@ -44,6 +44,8 @@ if ($http_method == 'PUT') {
     }
     if (strlen($posted_data) == 0) {
         DIE_WITH_ERROR(400, 'Missing posted data');
+        // we could allow empty data, but it does not make much sense 
+        // (except to consume inode, test rate limiter etc).
     }
     if (strlen($posted_data) > $client_config['max_size']) {
         DIE_WITH_ERROR(413, 'Posted data too large');

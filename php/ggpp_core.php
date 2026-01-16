@@ -40,30 +40,56 @@ class GGPP {
         return $this->storage;
     }
 
-    public function create_new_document($data, $client_id) {
+    public function create_new_document($data) {
         $udi = ggpp_create_new_udi($this->getStorage());
         // store the document using the storage backend
-        $this->storage->store_document($udi, $data, $client_id);
+        $this->storage->store_document($udi, $data);
         return $udi;
     }
 
-    public function get_document($udi, $client_id) {
+    public function get_document($udi) {
         if (ggpp_is_valid_udi($udi)) {
-            return $this->storage->get_document($udi, $client_id);
+            return $this->storage->get_document($udi);
         } else {
             DIE_WITH_ERROR(400, 'Invalid UDI format');
         }        
     }
 
-    public function update_document($udi, $data, $client_id) {
+    public function update_document($udi, $data) {
         if (ggpp_is_valid_udi($udi)) {
             if (!$this->storage->document_exists($udi)) {
                 DIE_WITH_ERROR(404, 'Document not found');
             }
-            $this->storage->store_document($udi, $data, $client_id);
+            $this->storage->store_document($udi, $data);
         } else {
             DIE_WITH_ERROR(400, 'Invalid UDI format');
         }
+    }
+
+    public function check_rate_limit($client_id, $md5_ip_address, $max_req_period, $max_req_count, $use_ip_lock) {
+        if ($max_req_period === -1 || $max_req_count === -1) {
+            return true; // no limit
+        }
+        $client_rate_key = $client_id . ($use_ip_lock ? '/'.$md5_ip_address : '');
+        $now = time();
+        //echo "Checkrate of $client_rate_key : Time = $now (".date('Y-m-d H:i:s', $now).")\n";
+        $rounded_time = floor($now / $max_req_period) * $max_req_period;
+        //echo "Rounded time = $rounded_time (".date('Y-m-d H:i:s', $rounded_time).")\n";
+        $nb_req_for_period = $this->storage->get_request_count($client_rate_key, $rounded_time);
+        //echo "Nb req for period = $nb_req_for_period\n";
+        if ($nb_req_for_period >= $max_req_count) {
+            return false; // rate limit exceeded
+        }
+        $this->storage->set_request_count($client_rate_key, $rounded_time, $nb_req_for_period + 1);
+        return true;
+    }
+
+    public function get_rate_usage($client_id, $md5_ip_address, $max_req_period, $max_req_count, $use_ip_lock) {
+        $client_rate_key = $client_id . ($use_ip_lock ? $md5_ip_address : '');
+        $now = time();
+        $rounded_time = floor($now / $max_req_period) * $max_req_period;
+        $nb_req_for_period = $this->storage->get_request_count($client_rate_key, $rounded_time);
+        return $nb_req_for_period;
     }
 }
 
@@ -115,8 +141,8 @@ function ggpp_create_new_udi($storageClass = null)
                 if ($i % 3 == 0) {
                     $udi .= '-';
                 }
-            //$udi .= UDI_ALPHABET[random_int(0, strlen(UDI_ALPHABET) - 1)];
-            $udi .= UDI_ALPHABET[random_int(0, 1)];
+            $udi .= UDI_ALPHABET[random_int(0, strlen(UDI_ALPHABET) - 1)];
+            //$udi .= UDI_ALPHABET[random_int(0, 0)]; // reduce entropy for test & debug
         }
         // check if udi already exists
         if ($storageClass != null && !$storageClass->document_exists($udi)) {

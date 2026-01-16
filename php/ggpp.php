@@ -27,7 +27,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X FORWARDED_FOR'] 
 }
 // for debugging purpose only, use $md5_ip_address = $ip_address;
 $md5_ip_address = md5($ip_address.$CONFIG['salt']); // Never work on real ip address, only on its hash with the salt
-$md5_ip_address = $ip_address; // debug only
+//$md5_ip_address = $ip_address; // debug only
 $ip_address = ''; unset($ip_address); // remove the real ip address from memory for better privacy
 
 $ggpp = new GGPP($CONFIG);

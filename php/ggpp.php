@@ -20,7 +20,7 @@ if (!isset($CONFIG['client_id'][$client_id])) {
 $client_config = $CONFIG['client_id'][$client_id];
 // get the client ip adresse from the http remote addr or the via http header X-Forwarded-For
 $ip_address = '';
-if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X FORWARDED_FOR'] != '') {
+if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
     $ip_address = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
 } else {
     $ip_address = $_SERVER['REMOTE_ADDR'];

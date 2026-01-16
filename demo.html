@@ -56,7 +56,8 @@ On error, the "error" text area contains the error code and message received fro
     <div>
         Create new content : <button onclick="doPUT()">PUT</button><br/>
         Retreive content created : <button onclick="doGET()">GET</button><br/>
-        Modify existing content : <button onclick="doPOST()">POST</button>
+        Modify existing content : <button onclick="doPOST()">POST</button><br/>
+        Get information : <button onclick="doOPTIONS()">OPTIONS</button><br/>
         
     </div>
 
@@ -89,6 +90,41 @@ On error, the "error" text area contains the error code and message received fro
             document.getElementById('udi').value = value;
         }
 
+        function doOPTIONS() {
+            const url = getURL();
+            const clientId = getClientId();
+            const udi = getUDI();
+
+            if (!url) {
+                setError('Client Error: URL is required');
+                return;
+            }
+
+            const queryString = '?client_id=' + encodeURIComponent(clientId) + '&udi=' + encodeURIComponent(udi);
+
+            fetch(url + queryString, {
+                method: 'OPTIONS'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error('HTTP ' + response.status + ': ' + text);
+                    });
+                }
+            })
+            .then(data => {
+                console.log("OPTIONS data:\n", data);
+                setData(data);
+                setError('');
+            })
+            .catch(error => {
+                console.log("OPTIONS error:\n", error);
+                setError(error.message);
+            });
+        }
+
         function doGET() {
             const url = getURL();
             const clientId = getClientId();
@@ -114,10 +150,12 @@ On error, the "error" text area contains the error code and message received fro
                 }
             })
             .then(data => {
+                console.log("GET data:\n", data);
                 setData(data);
                 setError('');
             })
             .catch(error => {
+                console.log("GET error:\n", error);
                 setError(error.message);
             });
         }
@@ -150,9 +188,11 @@ On error, the "error" text area contains the error code and message received fro
             })
             .then(responseData => {
                 //setData(responseData);
+                console.log("POST data:\n", responseData);
                 setError(responseData);
             })
             .catch(error => {
+                console.log("POST error:\n", error);
                 setError(error.message);
             });
         }
@@ -184,6 +224,7 @@ On error, the "error" text area contains the error code and message received fro
                 }
             })
             .then(responseData => {
+                console.log("PUT data:\n", responseData);
                 // Extract UDI from "OK:UDI" response
                 const match = responseData.match(/^OK:(.+)/);
                 setError(responseData);
@@ -194,6 +235,7 @@ On error, the "error" text area contains the error code and message received fro
                 }
             })
             .catch(error => {
+                console.log("OPTIONS error:\n", error);
                 setError(error.message);
             });
         }

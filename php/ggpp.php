@@ -25,8 +25,16 @@ if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X FORWARDED_FOR'] 
 } else {
     $ip_address = $_SERVER['REMOTE_ADDR'];
 }
+// for debugging purpose only, use $md5_ip_address = $ip_address;
 $md5_ip_address = md5($ip_address.$CONFIG['salt']); // Never work on real ip address, only on its hash with the salt
+$md5_ip_address = $ip_address; // debug only
 $ip_address = ''; unset($ip_address); // remove the real ip address from memory for better privacy
+
+$ggpp = new GGPP($CONFIG);
+$allowed = $ggpp->check_rate_limit($client_id, $md5_ip_address, $client_config['max_req_period'], $client_config['max_req_count'], $client_config['use_ip_lock']);
+if (!$allowed) {
+    DIE_WITH_ERROR(429, 'Too Many Requests');
+}
 
 if ($http_method == 'PUT') {
     // create a new document
@@ -37,11 +45,10 @@ if ($http_method == 'PUT') {
     if (strlen($posted_data) == 0) {
         DIE_WITH_ERROR(400, 'Missing posted data');
     }
-    if (strlen($posted_data) > $CONFIG['max_size']) {
+    if (strlen($posted_data) > $client_config['max_size']) {
         DIE_WITH_ERROR(413, 'Posted data too large');
     }
-    $ggpp = new GGPP($CONFIG);
-    $udi = $ggpp->create_new_document($posted_data, $client_id);
+    $udi = $ggpp->create_new_document($posted_data);
     echo "OK:$udi\n";
 }
 else if ($http_method == 'POST') {
@@ -53,13 +60,11 @@ else if ($http_method == 'POST') {
     if (strlen($posted_data) == 0) {
         DIE_WITH_ERROR(400, 'Missing posted data');
     }
-    if (strlen($posted_data) > $CONFIG['max_size']) {
+    if (strlen($posted_data) > $client_config['max_size']) {
         DIE_WITH_ERROR(413, 'Posted data too large');
     }
-    $ggpp = new GGPP($CONFIG);
-    $ggpp->update_document($udi, $posted_data, $client_id);
+    $ggpp->update_document($udi, $posted_data);
     echo "OK:$udi\n";
-    // ..to be continued..
 }
 else if ($http_method == 'GET') {
     // get an existing document
@@ -67,12 +72,20 @@ else if ($http_method == 'GET') {
     if ($udi == '') {
         DIE_WITH_ERROR(400, 'Missing udi');
     }
-    $ggpp = new GGPP($CONFIG);
-    $data = $ggpp->get_document($udi, $client_id);
+    $data = $ggpp->get_document($udi);
     if ($data === false) {
         DIE_WITH_ERROR(404, 'Document not found');
     }
     echo $data;
+}
+else if ($http_method == 'OPTIONS') {
+    // for CORS preflight requests
+    header('Access-Control-Allow-Methods: GET, PUT, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: X-Client-Id, Content-Type');
+    header('Access-Control-Max-Age: 86400'); // cache for 1 day
+    echo "client_id: $client_id\n";
+    echo "rate limit: ".$client_config['max_req_count']." requests per ".$client_config['max_req_period']." seconds\n";
+    echo "rate usage: ".$ggpp->get_rate_usage($client_id, $md5_ip_address, $client_config['max_req_period'], $client_config['max_req_count'], $client_config['use_ip_lock'])." requests used in the current period\n";
 }
 else {
     DIE_WITH_ERROR(405, 'Method Not Allowed');

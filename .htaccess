@@ -1,0 +1,4 @@
+# prevent direct access if data is accessible from the web server 
+RedirectMatch 403 ^.*.sqlite$
+RedirectMatch 403 ^.*.data$
+RedirectMatch 403 ^.*.rate$

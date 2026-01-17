@@ -36,6 +36,11 @@ From the client side, you can request the GGPP API like this :
 There is a live html demo availble here : `demo.html`.
 The client_id can be transmitted via the http header "x-client-id" (prefered method) or the query string (?client_id=xxx in the url).
 
+### Command line interface
+For statistics and maintenance, there is the "ggpp-cli.php" script to :
+- count number of document
+- get disk usage
+
 ## Error handling
 - 400 : Malformed request. Something is missing (the client_id or the udi or the data)
 - 403 : Not authorized. The client_id is not allowed to use the API.

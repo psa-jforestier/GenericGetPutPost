@@ -5,6 +5,7 @@
  */
 global $CONFIG;
 $CONFIG = [
+    'maintenance'=>false, // in maintenance mode, all actions will fails
     'storage' => 'file', // or mysql or sqlite
     'max_retention' => 2 * 365, // Maximum retention time in days
     'salt' => 'please_change_this_salt_value', // Change this value to a random string for better security

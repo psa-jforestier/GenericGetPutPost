@@ -9,6 +9,7 @@ $CONFIG = [
     'storage' => 'file', // or mysql or sqlite
     'max_retention' => 2 * 365, // Maximum retention time in days
     'salt' => 'please_change_this_salt_value', // Change this value to a random string for better security
+    'allowed-origins' => ['*'], // List of allowed origins for CORS. Use ['*'] to allow all origins. Can be overlodaded per client in .config.php (use "https://example.com:8080" format)
     // config for storage == file :
     'file' => [
         'path' => __DIR__ . '/../data/', // Path to the directory where files will be stored (must be rw accessible)

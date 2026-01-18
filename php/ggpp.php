@@ -1,17 +1,18 @@
 <?php
 
 include_once('.config.dist.php');
-
 include_once('ggpp_core.php');
+
+if ($CONFIG['maintenance']) {
+    DIE_WITH_ERROR(503, 'Service Unavailable - Maintenance Mode');
+    // Todo : add better maintenance mode, like a GET only mode (prevent data corruption during a backup)
+}
 
 $http_method = @$_SERVER['REQUEST_METHOD'];
 $posted_data = trim(@file_get_contents('php://input'));
-$client_id = (@$_SERVER['HTTP_X_CLIENT_ID'] != '' ? $_SERVER['HTTP_X_CLIENT_ID'] : @$_REQUEST['client_id']);
+$client_id = (@$_SERVER['HTTP_X_CLIENT_ID'] != '' ? $_SERVER['HTTP_X_CLIENT_ID'] : @$_REQUEST['client_id']); // client_id can come from the request (x-client-id) or from the query string (?&client_id)
 $client_id = trim($client_id);
-
-    header('Access-Control-Allow-Origin: *'); // Allow access from any origin
-
-
+$client_origin = trim(@$_SERVER['HTTP_ORIGIN']);
 
 // client_id is required (and must be authorized)
 if ($client_id == '') {
@@ -22,6 +23,24 @@ if (!isset($CONFIG['client_id'][$client_id])) {
 }
 
 $client_config = $CONFIG['client_id'][$client_id];
+$allowed_origins = $CONFIG['allowed-origins'];
+if (isset($client_config['allowed-origins'])) {
+    $allowed_origins = $client_config['allowed-origins']; // overload global allowed origins if set for this client
+}
+$allowed = 'who knows?';
+if ($client_origin != '') {
+    if (in_array('*', $allowed_origins)) {
+        $allowed = '*';
+    } 
+    else
+    if (in_array($client_origin, $allowed_origins)) {
+        $allowed = $client_origin;
+    }
+    else {
+        DIE_WITH_ERROR(403, 'Origin not allowed: '.$client_origin);
+    }
+}
+header('Access-Control-Allow-Origin: '.$allowed); 
 // get the client ip adresse from the http remote addr or the via http header X-Forwarded-For
 $ip_address = '';
 if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {

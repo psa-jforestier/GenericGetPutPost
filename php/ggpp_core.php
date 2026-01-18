@@ -13,7 +13,9 @@ define('UDI_MAX_TRIES', 5);
 
 function DIE_WITH_ERROR($http_status_code, $message) {
     header('HTTP/1.1 '.$http_status_code);
+    echo "<h1>Error $http_status_code</h1>\n";
     echo $message;
+    echo "<br>\n";
     exit;
 }
 

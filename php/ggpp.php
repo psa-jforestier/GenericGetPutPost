@@ -113,7 +113,6 @@ else if ($http_method == 'OPTIONS') {
     header('Access-Control-Allow-Headers: X-Client-Id, Content-Type');
     header('Access-Control-Max-Age: 86400'); // cache for 1 day
     header('Access-Control-Allow-Origin: *'); // Allow access from any origin
-    exit();
     echo "client_id: $client_id\n";
     echo "rate limit: ".$client_config['max_req_count']." requests per ".$client_config['max_req_period']." seconds\n";
     echo "rate usage: ".$ggpp->get_rate_usage($client_id, $md5_ip_address, $client_config['max_req_period'], $client_config['max_req_count'], $client_config['use_ip_lock'])." requests used in the current period\n";

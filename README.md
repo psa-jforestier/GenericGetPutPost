@@ -63,7 +63,9 @@ There is currently no rate limitation differenciation between read access (GET) 
 ## Server prerequisits :
 
 - PHP >7
-- For file system data storage backend : a writeable file system and the SQLite extension
+- For file system data storage backend : a writeable file system 
+- For SQLite backend : the SQLite extension in PHP + PDO
+- For MYSql backend : the MySQL extension in PHP + PDO
 
 ## Data security
 

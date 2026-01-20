@@ -22,8 +22,10 @@ function DIE_WITH_ERROR($http_status_code, $message) {
 class GGPP {
     private $config;
     private $storage;
+    
+    public static $version = '0.1';
 
-    public function __construct($config) {
+    public function __construct($config) {        
         $this->config = $config;
         $storage_type = $config['storage'];
         if (!in_array($storage_type, ['file', 'mysql', 'sqlite'])) {
@@ -93,6 +95,7 @@ class GGPP {
         $nb_req_for_period = $this->storage->get_request_count($client_rate_key, $rounded_time);
         return $nb_req_for_period;
     }
+
 }
 
 /**

@@ -56,9 +56,9 @@ To see the full actions of this cli tool, run `ggpp-cli.php --help`.
 
 ## Rate limitation
 
-The configuration file allow, for each client_id, to set a maximum number of write request (PUT or POST) per period of time. For example, it is possible to limit the client_id named "webdemo" to do no more than 1 request per minutes. If this client do more than 1 request (what ever it is PUT or POST) in 1 minute, it will receive a 429 error.
+The configuration file allow, for each client_id, to set a maximum number of request (GET, PUT or POST) per period of time. For example, it is possible to limit the client_id named "webdemo" to do no more than 1 request per minutes. If this client do more than 1 request (what ever it is GET, PUT or POST) in 1 minute, it will receive a 429 error.
 Rate limitation can be set by client_id only, or by client_id and ip address of the client (anonymized).
-There is currently no rate limitation on read access (GET).
+There is currently no rate limitation differenciation between read access (GET) and write access (PUT/POST).
 
 ## Server prerequisits :
 

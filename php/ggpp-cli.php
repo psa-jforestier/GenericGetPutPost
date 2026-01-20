@@ -197,7 +197,6 @@ function calculate_size_distribution($sizes, $max_size) {
 function delete_old($ggpp, $max_retention, $confirm) {
     global $CONFIG;
     $storage = $ggpp->getStorage();
-    $max_retention = 0;
     INFO("Scanning for documents older than $max_retention days...");
     $docs = getDocumentsList($storage);
     INFO("Evaluating " . count($docs) . " documents...");

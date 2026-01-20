@@ -40,6 +40,10 @@ The client_id can be transmitted via the http header "x-client-id" (prefered met
 For statistics and maintenance, there is the "ggpp-cli.php" script to :
 - count number of document
 - get disk usage
+- purge old document
+
+To see the full actions of this cli tool, run `ggpp-cli.php --help`.
+
 
 ## Error handling
 - 400 : Malformed request. Something is missing (the client_id or the udi or the data)

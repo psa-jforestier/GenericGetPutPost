@@ -62,7 +62,7 @@ There is currently no rate limitation differenciation between read access (GET) 
 
 ## Server prerequisits :
 
-- PHP >7
+- PHP >= 7
 - For file system data storage backend : a writeable file system 
 - For SQLite backend : the SQLite extension in PHP + PDO
 - For MYSql backend : the MySQL extension in PHP + PDO
@@ -83,13 +83,13 @@ On document creation, a new UDI is created. It looks like "YYM-ABC-DEF-GHI" wher
 - M is the month (from 1 (january) to C (december) : yes it is a base 12 digit)
 - ABC-DEF-GHI is a 9 letters code, formed of uppercase letters and numbers from the following alphabet : "ABCDEFGHJKLMNPRSTUVWXYZ123456789" (32 char). There is no O, Q or 0, no I or L. This code is is not incremental and not predictable. It is randomly generated with collision detection.
 
-At the end, the UDI can generate 31^9 combination per month.
+At the end, the UDI can generate 32^9 combination per month.
 
 ### File
 
 If the data storage backend is set to file, the document is stored locally, in a directory structure.
 The first sub-directory is the YYM code of the UDI, then the next 3 chars of the code is used to balance data file in sub directories.
-Example : for UDI "26B-CWP-R3S-9CN", the data file is stored in "26B/QWP/26B-QWP-R3S-9CN.data"
+Example : for UDI "26B-CWP-R3S-9CN", the data file is stored in "26B/CWP/26B-CWP-R3S-9CN.data"
 
 #### Implementation of the rate limitation
 With the file data storage backend, this application rely on a SQLite database to track request rate of client_id.

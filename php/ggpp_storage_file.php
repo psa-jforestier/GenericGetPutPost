@@ -24,6 +24,12 @@ class StorageFile extends Storage {
             mkdir($dir, 0700, true);
         }
     }
+
+    // Expose the PDO object for advanced usage if needed (command line interface)
+    public function getStoragePHPObject() {
+        return $this->storage_dir;
+    }
+
     private function split_udi_into_fragments($udi) {
         // crash on invlid udi
         if (strpos($udi, '.') !== false || strpos($udi, '/') !== false || strpos($udi, '\\') !== false) {
@@ -49,6 +55,16 @@ class StorageFile extends Storage {
     public function document_exists($udi) {
         $filename = $this->get_real_document_filename($udi);
         return file_exists($filename);
+    }
+
+    public function delete_document($udi) {
+        $filename = $this->get_real_document_filename($udi);
+        if (file_exists($filename)) {
+            unlink($filename);
+            // __JFO TODO purge empty directories
+            return true;
+        }
+        return false;
     }
 
     public function get_document($udi) {
@@ -91,5 +107,10 @@ class StorageFile extends Storage {
         file_put_contents($rate_file, (string)$count);
         // set the modification time of the file to the start time of the period
         touch($rate_file, $rounded_time);
+    }
+
+    public function getStorageDir()
+    {
+        return $this->storage_dir;
     }
 }

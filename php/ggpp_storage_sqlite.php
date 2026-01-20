@@ -39,6 +39,11 @@ class StorageSQLite extends Storage {
         }
     }
 
+    // Expose the PDO object for advanced usage if needed (command line interface)
+    public function getStoragePHPObject() {
+        return $this->pdo;
+    }
+
     public function document_exists($udi) 
     {
         try {
@@ -49,6 +54,18 @@ class StorageSQLite extends Storage {
             return $count > 0;
         } catch (PDOException $e) {
             DIE_WITH_ERROR(500, 'Database query failed: ' . $e->getMessage());
+        }
+    }
+
+    public function delete_document($udi) 
+    {
+        try {
+            // prepare and execute the query
+            $stmt = $this->pdo->prepare("DELETE FROM documents WHERE udi = :udi");
+            $stmt->execute([':udi' => $udi]);
+            return true;
+        } catch (PDOException $e) {
+            DIE_WITH_ERROR(500, 'Database delete failed: ' . $e->getMessage());
         }
     }
 

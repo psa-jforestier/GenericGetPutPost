@@ -65,6 +65,16 @@ class StorageMySQL extends Storage {
         }
     }
 
+    public function delete_document($udi) {
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM documents WHERE udi = :udi");
+            $stmt->execute([':udi' => $udi]);
+            return true;
+        } catch (PDOException $e) {
+            DIE_WITH_ERROR(500, 'Database query failed: ' . $e->getMessage());
+        }
+    }
+
     public function get_document($udi) {
         try {
             $stmt = $this->pdo->prepare("SELECT data FROM documents WHERE udi = :udi LIMIT 1");

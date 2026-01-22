@@ -27,7 +27,7 @@ $allowed_origins = $CONFIG['allowed-origins'];
 if (isset($client_config['allowed-origins'])) {
     $allowed_origins = $client_config['allowed-origins']; // overload global allowed origins if set for this client
 }
-$allowed = 'who knows?';
+$allowed = false;
 if ($client_origin != '') {
     if (in_array('*', $allowed_origins)) {
         $allowed = '*';
@@ -40,7 +40,8 @@ if ($client_origin != '') {
         DIE_WITH_ERROR(403, 'Origin not allowed: '.$client_origin);
     }
 }
-header('Access-Control-Allow-Origin: '.$allowed); 
+if ($allowed !== false) // if nor Origin headers in the request, no need to reply a CORS header
+	header('Access-Control-Allow-Origin: '.$allowed); 
 // get the client ip adresse from the http remote addr or the via http header X-Forwarded-For
 $ip_address = '';
 if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
@@ -59,9 +60,9 @@ if (!$allowed) {
     DIE_WITH_ERROR(429, 'Too Many Requests');
 }
 
-
-
-
+/**
+ ** Main code : handling HTTP verbs
+ **/
 
 if ($http_method == 'PUT') {
     // create a new document
@@ -105,6 +106,7 @@ else if ($http_method == 'GET') {
     if ($data === false) {
         DIE_WITH_ERROR(404, 'Document not found');
     }
+	header("etag: ${udi}-${client_id}");
     echo $data;
 }
 else if ($http_method == 'OPTIONS') {
@@ -119,4 +121,6 @@ else if ($http_method == 'OPTIONS') {
 }
 else {
     DIE_WITH_ERROR(405, 'Method Not Allowed');
+	/** One day, we could handle DEL request (to delete content), or HEAD (to get content-length only)
+	 **/
 }

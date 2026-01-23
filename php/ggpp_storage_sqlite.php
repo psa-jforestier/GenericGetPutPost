@@ -24,7 +24,9 @@ class StorageSQLite extends Storage {
                 CREATE TABLE IF NOT EXISTS documents (
                     udi TEXT PRIMARY KEY,
                     data BLOB,
-                    date_update TEXT
+                    date_update TEXT,
+                    date_creation TEXT,
+                    date_access TEXT
                 );
             ");
             $this->pdo->exec("

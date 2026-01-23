@@ -37,6 +37,8 @@ class StorageMySQL extends Storage {
                     udi VARCHAR(15) PRIMARY KEY,
                     data LONGBLOB NOT NULL,
                     date_update DATETIME NOT NULL,
+                    date_creation DATETIME NOT NULL,
+                    date_access DATETIME NOT NULL,
                     KEY idx_date_update (date_update)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ");

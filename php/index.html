@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GGPP Enhanced Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .header a {
+            color: white;
+        }
+
+        .header a:hover {
+            text-decoration: wavy underline;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .config-section {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .config-section h2 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .config-section.collapsible h2:hover {
+            color: #0066cc;
+        }
+
+        .config-section.collapsible h2::before {
+            content: '\25bc';
+            font-size: 0.8em;
+            transition: transform 0.3s;
+        }
+
+        .config-section.collapsed h2::before {
+            transform: rotate(-90deg);
+        }
+
+        .config-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .config-section.collapsed .config-content {
+            max-height: 0 !important;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 3px;
+            font-size: 0.85em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .form-group textarea {
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.75em;
+            color: #718096;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+
+        .action-card:hover {
+            border-color: #0066cc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-card h3 {
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-size: 1em;
+        }
+
+        .action-card p {
+            color: #718096;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #117a8b;
+        }
+
+        .btn-warning {
+            background: #ff8800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67700;
+        }
+
+        .response-section {
+            margin-top: 15px;
+        }
+
+        .response-box {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .response-box h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+
+        .response-box.success {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+        }
+
+        .response-box.success h3 {
+            color: #22543d;
+        }
+
+        .response-box.error {
+            background: #fff5f5;
+            border-color: #fc8181;
+        }
+
+        .response-box.error h3 {
+            color: #742a2a;
+        }
+
+        .response-content {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.85em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .instructions {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #333;
+        }
+
+        .instructions h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1em;
+        }
+
+        .instructions h3:hover {
+            color: #0066cc;
+        }
+
+        .instructions h3::before {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s;
+        }
+
+        .instructions.collapsed h3::before {
+            transform: rotate(-90deg);
+        }
+
+        .instructions-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .instructions.collapsed .instructions-content {
+            max-height: 0 !important;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #4a5568;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+
+        .instructions ol li {
+            margin-bottom: 4px;
+        }
+
+        .code {
+            background: #e8e8e8;
+            color: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 GGPP Demo</h1>
+            <p>Generic GET PUT POST - Document Storage API - 
+                <a href="https://github.com/psa-jforestier/GenericGetPutPost" target="_blank">
+                    Find me on GitHub</a>
+            </p>
+        </div>
+
+        <div class="content">
+            <!-- Instructions -->
+            <div class="instructions" id="instructions">
+                <h3 onclick="toggleInstructions()">📖 Quick Start Guide</h3>
+                <div class="instructions-content">
+                    <ol>
+                        <li>Configure your API URL and Client ID below</li>
+                        <li>Use <span class="code">PUT</span> to create a new document (UDI will be auto-generated)</li>
+                        <li>Use <span class="code">GET</span> to retrieve an existing document (requires UDI)</li>
+                        <li>Use <span class="code">POST</span> to update an existing document (requires UDI)</li>
+                        <li>Use <span class="code">OPTIONS</span> to check rate limits and configuration</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Configuration Section -->
+            <div class="config-section collapsible" id="configSection">
+                <h2 onclick="toggleConfig()">⚙️ Configuration</h2>
+                <div class="config-content">
+                    <div class="form-group">
+                        <label for="url">API URL</label>
+                        <input type="text" id="url" value="http://localhost:8000/php/ggpp.php" placeholder="http://localhost:8000/php/ggpp.php">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="client_id">Client ID</label>
+                        <input type="text" id="client_id" value="ggppdemo" placeholder="Enter your client ID">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="udi">Document UDI (Unique Document Identifier)</label>
+                        <input type="text" id="udi" placeholder="Will be auto-filled after PUT, or enter manually for GET/POST">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Section -->
+            <div class="config-section">
+                <h2>📝 Document Data</h2>
+                <div class="form-group">
+                    <label for="data">Content (text, JSON, or any data)</label>
+                    <div class="textarea-wrapper">
+                        <textarea id="data" rows="12" placeholder="Enter document content here...&#x0a;&#x0a;Example:&#x0a;{&#x0a;  &quot;title&quot;: &quot;My Document&quot;,&#x0a;  &quot;content&quot;: &quot;Hello World&quot;&#x0a;}"></textarea>
+                        <span class="char-counter" id="charCounter">0 chars</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-grid">
+                <div class="action-card">
+                    <button class="btn btn-success" onclick="doPUT()">Create Document</button>
+                    <h3>📤 PUT - Create New</h3>
+                    <p>Create a new document. The server will generate a unique UDI and return it in the response.</p>
+                    
+                </div>
+
+                <div class="action-card">
+                    <button class="btn btn-primary" onclick="doGET()">Get Document</button>
+                    <h3>📥 GET - Retrieve</h3>
+                    <p>Retrieve an existing document using its UDI. The content will be displayed in the data field.</p>
+                    
+                </div>
+
+                <div class="action-card">
+                    <button class="btn btn-warning" onclick="doPOST()">Update Document</button>
+                    <h3>✏️ POST - Update</h3>
+                    <p>Update an existing document. Requires a valid UDI. The content in the data field will replace the existing document.</p>
+                    
+                </div>
+
+                <div class="action-card">
+                    <button class="btn btn-info" onclick="doOPTIONS()">Get Info</button>
+                    <h3>ℹ️ OPTIONS - Info</h3>
+                    <p>Get information about the API, including rate limits and current usage.</p>
+                    
+                </div>
+            </div>
+
+            <!-- Response Section -->
+            <div class="response-section">
+                <div id="successBox" class="response-box success hidden">
+                    <h3>
+                        ✅ Success
+                        <span class="status-badge success" id="successStatus"></span>
+                    </h3>
+                    <div class="response-content" id="successContent"></div>
+                </div>
+
+                <div id="errorBox" class="response-box error hidden">
+                    <h3>
+                        ❌ Error
+                        <span class="status-badge error" id="errorStatus"></span>
+                    </h3>
+                    <div class="response-content" id="errorContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions
+        function getURL() {
+            return document.getElementById('url').value.trim();
+        }
+
+        function getClientId() {
+            return document.getElementById('client_id').value.trim();
+        }
+
+        function getUDI() {
+            return document.getElementById('udi').value.trim();
+        }
+
+        function getData() {
+            return document.getElementById('data').value;
+        }
+
+        function setData(value) {
+            document.getElementById('data').value = value;
+            updateCharCounter();
+        }
+
+        function setUDI(value) {
+            document.getElementById('udi').value = value;
+        }
+
+        function updateURLHash(udi) {
+            if (udi) {
+                window.location.hash = `udi=${encodeURIComponent(udi)}`;
+            }
+        }
+
+        function loadUDIFromHash() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#udi=')) {
+                const udi = decodeURIComponent(hash.substring(5));
+                if (udi) {
+                    setUDI(udi);
+                }
+            }
+        }
+
+        function toggleInstructions() {
+            const instructions = document.getElementById('instructions');
+            const content = instructions.querySelector('.instructions-content');
+            
+            if (instructions.classList.contains('collapsed')) {
+                // Expand
+                content.style.maxHeight = content.scrollHeight + 'px';
+                instructions.classList.remove('collapsed');
+            } else {
+                // Collapse
+                content.style.maxHeight = '0';
+                instructions.classList.add('collapsed');
+            }
+        }
+
+        function toggleConfig() {
+            const config = document.getElementById('configSection');
+            const content = config.querySelector('.config-content');
+            
+            if (config.classList.contains('collapsed')) {
+                // Expand
+                content.style.maxHeight = content.scrollHeight + 'px';
+                config.classList.remove('collapsed');
+            } else {
+                // Collapse
+                content.style.maxHeight = '0';
+                config.classList.add('collapsed');
+            }
+        }
+
+        function updateCharCounter() {
+            const data = document.getElementById('data').value;
+            const counter = document.getElementById('charCounter');
+            const length = data.length;
+            counter.textContent = `${length.toLocaleString()} char${length !== 1 ? 's' : ''}`;
+        }
+
+        function showSuccess(message, status = '') {
+            const successBox = document.getElementById('successBox');
+            const successContent = document.getElementById('successContent');
+            const successStatus = document.getElementById('successStatus');
+            
+            successContent.textContent = message;
+            successStatus.textContent = status;
+            successBox.classList.remove('hidden');
+            
+            // Hide error box
+            document.getElementById('errorBox').classList.add('hidden');
+        }
+
+        function showError(message, status = '') {
+            const errorBox = document.getElementById('errorBox');
+            const errorContent = document.getElementById('errorContent');
+            const errorStatus = document.getElementById('errorStatus');
+            
+            errorContent.textContent = message;
+            errorStatus.textContent = status;
+            errorBox.classList.remove('hidden');
+            
+            // Hide success box
+            document.getElementById('successBox').classList.add('hidden');
+            
+            // Scroll to error box
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideResponses() {
+            document.getElementById('successBox').classList.add('hidden');
+            document.getElementById('errorBox').classList.add('hidden');
+        }
+
+        // Validation
+        function validateConfig() {
+            if (!getURL()) {
+                showError('API URL is required', 'VALIDATION ERROR');
+                return false;
+            }
+            if (!getClientId()) {
+                showError('Client ID is required', 'VALIDATION ERROR');
+                return false;
+            }
+            return true;
+        }
+
+        // API Methods
+        function doPUT() {
+            if (!validateConfig()) return;
+
+            const url = getURL();
+            const clientId = getClientId();
+            const data = getData();
+
+            if (!data) {
+                showError('Data cannot be empty for PUT request', 'VALIDATION ERROR');
+                return;
+            }
+
+            hideResponses();
+
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'X-Client-ID': clientId
+                },
+                body: data
+            })
+            .then(response => {
+                const statusText = `HTTP ${response.status}`;
+                if (response.ok) {
+                    return response.text().then(text => ({ text, statusText, ok: true }));
+                } else {
+                    return response.text().then(text => ({ text, statusText, ok: false }));
+                }
+            })
+            .then(result => {
+                if (result.ok) {
+                    // Extract UDI from "OK:UDI" response
+                    const match = result.text.match(/^OK:(.+)/);
+                    if (match) {
+                        const udi = match[1].trim();
+                        setUDI(udi);
+                        updateURLHash(udi);
+                        showSuccess(
+                            `Document created successfully!\n\nUDI: ${udi}\n\nYou can now use GET to retrieve it or POST to update it.`,
+                            result.statusText
+                        );
+                    } else {
+                        showSuccess(result.text, result.statusText);
+                    }
+                } else {
+                    showError(result.text, result.statusText);
+                }
+            })
+            .catch(error => {
+                showError(`Network error: ${error.message}`, 'NETWORK ERROR');
+            });
+        }
+
+        function doGET() {
+            if (!validateConfig()) return;
+
+            const url = getURL();
+            const clientId = getClientId();
+            const udi = getUDI();
+
+            if (!udi) {
+                showError('UDI is required for GET request', 'VALIDATION ERROR');
+                return;
+            }
+
+            hideResponses();
+
+            const queryString = `?udi=${encodeURIComponent(udi)}`;
+
+            fetch(url + queryString, {
+                method: 'GET',
+                headers: {
+                    'X-Client-ID': clientId
+                }
+            })
+            .then(response => {
+                const statusText = `HTTP ${response.status}`;
+                if (response.ok) {
+                    return response.text().then(text => ({ text, statusText, ok: true }));
+                } else {
+                    return response.text().then(text => ({ text, statusText, ok: false }));
+                }
+            })
+            .then(result => {
+                if (result.ok) {
+                    setData(result.text);
+                    updateURLHash(udi);
+                    showSuccess(
+                        `Document retrieved successfully!\n\nUDI: ${getUDI()}\nContent has been loaded into the data field.`,
+                        result.statusText
+                    );
+                } else {
+                    showError(result.text, result.statusText);
+                }
+            })
+            .catch(error => {
+                showError(`Network error: ${error.message}`, 'NETWORK ERROR');
+            });
+        }
+
+        function doPOST() {
+            if (!validateConfig()) return;
+
+            const url = getURL();
+            const clientId = getClientId();
+            const udi = getUDI();
+            const data = getData();
+
+            if (!udi) {
+                showError('UDI is required for POST request', 'VALIDATION ERROR');
+                return;
+            }
+
+            if (!data) {
+                showError('Data cannot be empty for POST request', 'VALIDATION ERROR');
+                return;
+            }
+
+            hideResponses();
+
+            const queryString = `?udi=${encodeURIComponent(udi)}`;
+
+            fetch(url + queryString, {
+                method: 'POST',
+                headers: {
+                    'X-Client-ID': clientId
+                },
+                body: data
+            })
+            .then(response => {
+                const statusText = `HTTP ${response.status}`;
+                if (response.ok) {
+                    return response.text().then(text => ({ text, statusText, ok: true }));
+                } else {
+                    return response.text().then(text => ({ text, statusText, ok: false }));
+                }
+            })
+            .then(result => {
+                if (result.ok) {
+                    updateURLHash(udi);
+                    showSuccess(
+                        `Document updated successfully!\n\nUDI: ${udi}\n\nResponse: ${result.text}`,
+                        result.statusText
+                    );
+                } else {
+                    showError(result.text, result.statusText);
+                }
+            })
+            .catch(error => {
+                showError(`Network error: ${error.message}`, 'NETWORK ERROR');
+            });
+        }
+
+        function doOPTIONS() {
+            if (!validateConfig()) return;
+
+            const url = getURL();
+            const clientId = getClientId();
+
+            hideResponses();
+
+            fetch(url, {
+                method: 'OPTIONS',
+                headers: {
+                    'X-Client-ID': clientId
+                }
+            })
+            .then(response => {
+                const statusText = `HTTP ${response.status}`;
+                if (response.ok) {
+                    return response.text().then(text => ({ text, statusText, ok: true }));
+                } else {
+                    return response.text().then(text => ({ text, statusText, ok: false }));
+                }
+            })
+            .then(result => {
+                if (result.ok) {
+                    const currentUdi = getUDI();
+                    if (currentUdi) {
+                        updateURLHash(currentUdi);
+                    }
+                    showSuccess(
+                        `API Information:\n\n${result.text}`,
+                        result.statusText
+                    );
+                } else {
+                    showError(result.text, result.statusText);
+                }
+            })
+            .catch(error => {
+                showError(`Network error: ${error.message}`, 'NETWORK ERROR');
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to PUT
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                doPUT();
+            }
+        });
+
+        // Update character counter on input
+        document.getElementById('data').addEventListener('input', updateCharCounter);
+
+        // Auto-focus on data field and load UDI from hash
+        window.addEventListener('load', function() {
+            // Initialize URL field with current page URL, replacing the last part with ggpp.php
+            const currentUrl = window.location.href.split('?')[0].split('#')[0]; // Remove hash and query params
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1); // Get directory part
+            const apiUrl = baseUrl + 'ggpp.php';
+            document.getElementById('url').value = apiUrl;
+            
+            loadUDIFromHash();
+            const udi = getUDI();
+            
+            // Initialize character counter
+            updateCharCounter();
+            
+            // Set initial max-height for instructions content
+            const instructions = document.getElementById('instructions');
+            const instructionsContent = instructions.querySelector('.instructions-content');
+            instructionsContent.style.maxHeight = instructionsContent.scrollHeight + 'px';
+            
+            // Set initial max-height for config content
+            const config = document.getElementById('configSection');
+            const configContent = config.querySelector('.config-content');
+            configContent.style.maxHeight = configContent.scrollHeight + 'px';
+            
+            if (udi) {
+                // If UDI was loaded from hash, hide instructions and config, then fetch the document
+                instructionsContent.style.maxHeight = '0';
+                instructions.classList.add('collapsed');
+                
+                configContent.style.maxHeight = '0';
+                config.classList.add('collapsed');
+                
+                doGET();
+            } else {
+                document.getElementById('data').focus();
+            }
+        });
+    </script>
+</body>
+</html>

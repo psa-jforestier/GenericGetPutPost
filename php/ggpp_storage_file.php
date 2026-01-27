@@ -104,7 +104,7 @@ class StorageFile extends Storage {
     {
         $rate_file = $this->storage_dir
             .DIRECTORY_SEPARATOR.'rate_limit_'.$client_rate_key.'.rate';
-        file_put_contents($rate_file, (string)$count);
+        file_put_contents($rate_file, (string)$count, LOCK_EX);
         // set the modification time of the file to the start time of the period
         touch($rate_file, $rounded_time);
     }

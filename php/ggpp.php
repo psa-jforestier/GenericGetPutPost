@@ -106,7 +106,7 @@ else if ($http_method == 'GET') {
     if ($data === false) {
         DIE_WITH_ERROR(404, 'Document not found');
     }
-	header("etag: ${udi}-${client_id}");
+	header('etag: '.urlencode($udi).'-'.urlencode($client_id));
     echo $data;
 }
 else if ($http_method == 'OPTIONS') {
